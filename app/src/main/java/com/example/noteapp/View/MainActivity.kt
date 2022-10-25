@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var noteViewModel: NoteViewModel
 
     lateinit var addActivityResultLauncher : ActivityResultLauncher<Intent>
+    lateinit var updateActivityResultLauncher : ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         noteViewModel = ViewModelProvider(this, viewModelFactory).get(NoteViewModel::class.java);
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val noteAdapter = NoteAdapter();
-        recyclerView.adapter = noteAdapter;
+        val noteAdapter = NoteAdapter(this)
+        recyclerView.adapter = noteAdapter
 
         //register activity for result
         registerActivityResultLauncher()
@@ -85,6 +86,31 @@ class MainActivity : AppCompatActivity() {
                 noteViewModel.insert(note)
             }
         })
+
+        updateActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), {
+                resultUpdateNote ->
+
+            val resultCode = resultUpdateNote.resultCode
+            // Note title and note description that we send using intent will be in the data object
+            // Here we will be able to get the title and description using data object
+            val data = resultUpdateNote.data
+
+//            intent.putExtra("updatedTitle", updatedTitle)
+//            intent.putExtra("updatedDescription", updatedDescription)
+            if(resultCode == RESULT_OK && data != null){
+
+                val updatedTitle : String = data.getStringExtra("updatedTitle").toString()
+                val updatedDescription : String = data.getStringExtra("updatedDescription").toString()
+                val noteId = data.getIntExtra("noteId", -1)
+
+                val newNote = Note(updatedTitle, updatedDescription)
+                newNote.id = noteId
+
+                noteViewModel.update(newNote)
+            }
+        })
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

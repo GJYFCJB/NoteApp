@@ -1,5 +1,6 @@
 package com.example.noteapp.Adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +9,12 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteapp.Model.Note
 import com.example.noteapp.R
+import com.example.noteapp.View.MainActivity
+import com.example.noteapp.View.UpdateActivity
+
 //Adapter is what provides a connection between the data source and view
 //database - Adapter - recycler view
-class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
+class NoteAdapter(private val activity: MainActivity) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
 
     var notes : List<Note> = ArrayList();
 
@@ -35,6 +39,18 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
 
         holder.textViewTitle.text = currentNote.title
         holder.textViewDescription.text = currentNote.description
+
+        holder.cardView.setOnClickListener {
+
+            val intent = Intent(activity, UpdateActivity::class.java)
+            intent.putExtra("currentTitle", currentNote.title)
+            intent.putExtra("currentDescription", currentNote.description)
+            intent.putExtra("currentId", currentNote.id)
+            //activity result launcher
+            activity.updateActivityResultLauncher.launch(intent)
+
+
+        }
 
     }
 
